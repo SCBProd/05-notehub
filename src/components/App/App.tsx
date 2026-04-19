@@ -42,15 +42,12 @@ export default function App() {
         </button>
       </header>
 
-      <NoteList
-        page={page}
-        perPage={perPage}
-        search={debouncedSearch}
-      />
+    <NoteList notes={notes} />
 
       <Pagination
-        page={page}
-        setPage={setPage}
+      currentPage={page}
+      totalPages={totalPages}
+      setPage={setPage}
       />
 
       {isModalOpen && (

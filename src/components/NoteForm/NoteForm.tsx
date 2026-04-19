@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
 
 import { createNote } from "../../services/noteService";
+import type { CreateNoteDto, Tag } from "../../types/note";
 
 const validationSchema = Yup.object({
   title: Yup.string()
@@ -18,9 +19,15 @@ const validationSchema = Yup.object({
     .required("Required"),
 });
 
-type NoteFormProps = {
+interface FormValues {
+  title: string;
+  content: string;
+  tag: Tag;
+}
+
+interface NoteFormProps {
   onClose: () => void;
-};
+}
 
 export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
@@ -34,7 +41,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
   });
 
   return (
-    <Formik
+    <Formik<FormValues>
       initialValues={{
         title: "",
         content: "",
@@ -42,7 +49,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       }}
       validationSchema={validationSchema}
       onSubmit={(values, actions) => {
-        mutation.mutate(values);
+        mutation.mutate(values as CreateNoteDto);
         actions.resetForm();
       }}
     >
