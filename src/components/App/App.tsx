@@ -11,7 +11,10 @@ import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import SearchBox from "../SearchBox/SearchBox";
 
-import type { NotesResponse } from "../../types/api";
+type NotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
 
 const API_URL = "https://notehub-public.goit.study/api/notes";
 const TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
