@@ -15,8 +15,10 @@ const validationSchema = Yup.object({
     .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
     .required('Required'),
 });
-
-export default function NoteForm({ onClose }) {
+type Props = {
+  onClose: () => void;
+};
+export default function NoteForm({ onClose }: Props) {
   return (
     <Formik
       initialValues={{

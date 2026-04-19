@@ -19,12 +19,12 @@ export default function App() {
   const perPage = 12;
 
   // debounce (обов’язково в App)
-  const debounced = useDebouncedCallback((value) => {
+  const debounced = useDebouncedCallback((value: string) => {
     setDebouncedSearch(value);
     setPage(1); // важливо: при пошуку повертаємось на першу сторінку
   }, 500);
 
-  const handleSearch = (value) => {
+  const handleSearch = (value: string) => {
     setSearch(value);
     debounced(value);
   };
