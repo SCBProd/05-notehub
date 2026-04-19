@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Note, NotesResponse, CreateNoteDto } from "../types/note";
+import type { Note, NotesResponse, CreateNoteDto } from "../types/note";
 
 // GET notes
 export const fetchNotes = async (params: {

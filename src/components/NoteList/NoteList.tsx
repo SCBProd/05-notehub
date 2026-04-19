@@ -1,15 +1,18 @@
 import css from './NoteList.module.css';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-
-
+import type { Note, NotesResponse } from '../../types/note';
 
 const API_URL = 'https://notehub-public.goit.study/api/notes';
 const TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export default function NoteList({ page, perPage, search }) {
+export default function NoteList({ page, perPage, search }: {
+  page: number;
+  perPage: number;
+  search: string;
+}) {
   const queryClient = useQueryClient();
 
-  const { data } = useQuery({
+  const { data } = useQuery<NotesResponse>({
     queryKey: ['notes', page, perPage, search],
     queryFn: async () => {
       const res = await fetch(
@@ -27,12 +30,12 @@ export default function NoteList({ page, perPage, search }) {
 
       return res.json();
     },
-    keepPreviousData: true,
+    placeholderData: (prev) => prev,
   });
 
   const notes = data?.notes ?? [];
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
       headers: {
@@ -43,16 +46,13 @@ export default function NoteList({ page, perPage, search }) {
     queryClient.invalidateQueries({ queryKey: ['notes'] });
   };
 
-  if (!notes.length) {
-    return null;
-  }
+  if (!notes.length) return null;
 
   return (
     <ul className={css.list}>
-      {notes.map(note => (
+      {notes.map((note: Note) => (
         <li key={note.id} className={css.listItem}>
           <h2 className={css.title}>{note.title}</h2>
-
           <p className={css.content}>{note.content}</p>
 
           <div className={css.footer}>
