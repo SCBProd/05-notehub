@@ -20,4 +20,7 @@ export interface CreateNoteDto {
   content: string;
   tag: Tag;
 }
-
+export interface NotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
