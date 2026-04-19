@@ -1,36 +1,49 @@
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import css from './NoteForm.module.css';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import css from "./NoteForm.module.css";
+
+import { createNote } from "../../services/noteService";
 
 const validationSchema = Yup.object({
   title: Yup.string()
-    .min(3, 'Min 3 characters')
-    .max(50, 'Max 50 characters')
-    .required('Required'),
+    .min(3, "Min 3 characters")
+    .max(50, "Max 50 characters")
+    .required("Required"),
 
-  content: Yup.string()
-    .max(500, 'Max 500 characters'),
+  content: Yup.string().max(500, "Max 500 characters"),
 
   tag: Yup.string()
-    .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
-    .required('Required'),
+    .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
+    .required("Required"),
 });
-type Props = {
+
+type NoteFormProps = {
   onClose: () => void;
 };
-export default function NoteForm({ onClose }: Props) {
+
+export default function NoteForm({ onClose }: NoteFormProps) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      onClose();
+    },
+  });
+
   return (
     <Formik
       initialValues={{
-        title: '',
-        content: '',
-        tag: 'Todo',
+        title: "",
+        content: "",
+        tag: "Todo",
       }}
       validationSchema={validationSchema}
       onSubmit={(values, actions) => {
-        console.log(values);
+        mutation.mutate(values);
         actions.resetForm();
-        onClose();
       }}
     >
       {({ isSubmitting }) => (
@@ -66,11 +79,19 @@ export default function NoteForm({ onClose }: Props) {
           </div>
 
           <div className={css.actions}>
-            <button type="button" onClick={onClose} className={css.cancelButton}>
+            <button
+              type="button"
+              onClick={onClose}
+              className={css.cancelButton}
+            >
               Cancel
             </button>
 
-            <button type="submit" className={css.submitButton} disabled={isSubmitting}>
+            <button
+              type="submit"
+              className={css.submitButton}
+              disabled={isSubmitting || mutation.isPending}
+            >
               Create note
             </button>
           </div>

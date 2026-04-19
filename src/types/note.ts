@@ -14,10 +14,6 @@ export interface Note {
   tag: Tag;
 }
 
-export interface NotesResponse {
-  notes: Note[];
-  totalPages: number;
-}
 
 export interface CreateNoteDto {
   title: string;
@@ -25,7 +21,3 @@ export interface CreateNoteDto {
   tag: Tag;
 }
 
-export interface ApiError {
-  message: string;
-  error?: string;
-}

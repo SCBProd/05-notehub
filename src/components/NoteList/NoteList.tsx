@@ -1,56 +1,37 @@
-import css from './NoteList.module.css';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Note, NotesResponse } from '../../types/note';
+import css from "./NoteList.module.css";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Note } from "../../types/note";
 
-const API_URL = 'https://notehub-public.goit.study/api/notes';
+import axios from "axios";
+
+const API_URL = "https://notehub-public.goit.study/api/notes";
 const TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export default function NoteList({ page, perPage, search }: {
-  page: number;
-  perPage: number;
-  search: string;
-}) {
+type NoteListProps = {
+  notes: Note[];
+};
+
+export default function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
-  const { data } = useQuery<NotesResponse>({
-    queryKey: ['notes', page, perPage, search],
-    queryFn: async () => {
-      const res = await fetch(
-        `${API_URL}?page=${page}&perPage=${perPage}&search=${search}`,
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch notes');
-      }
-
-      return res.json();
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      });
     },
-    placeholderData: (prev) => prev,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
   });
-
-  const notes = data?.notes ?? [];
-
-  const handleDelete = async (id: string) => {
-    await fetch(`${API_URL}/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${TOKEN}`,
-      },
-    });
-
-    queryClient.invalidateQueries({ queryKey: ['notes'] });
-  };
 
   if (!notes.length) return null;
 
   return (
     <ul className={css.list}>
-      {notes.map((note: Note) => (
+      {notes.map((note) => (
         <li key={note.id} className={css.listItem}>
           <h2 className={css.title}>{note.title}</h2>
           <p className={css.content}>{note.content}</p>
@@ -60,7 +41,8 @@ export default function NoteList({ page, perPage, search }: {
 
             <button
               className={css.button}
-              onClick={() => handleDelete(note.id)}
+              onClick={() => deleteMutation.mutate(note.id)}
+              disabled={deleteMutation.isPending}
             >
               Delete
             </button>
