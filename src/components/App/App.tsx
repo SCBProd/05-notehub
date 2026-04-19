@@ -11,7 +11,7 @@ import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import SearchBox from "../SearchBox/SearchBox";
 
-import type { NotesResponse } from "../../types/note";
+import type { NotesResponse } from "../../types/api";
 
 const API_URL = "https://notehub-public.goit.study/api/notes";
 const TOKEN = import.meta.env.VITE_NOTEHUB_TOKEN;
@@ -35,7 +35,6 @@ export default function App() {
     debounced(value);
   };
 
-  // ✔️ ДЖЕРЕЛО ДАНИХ (FIX ALL ERRORS HERE)
   const { data } = useQuery<NotesResponse>({
     queryKey: ["notes", page, perPage, debouncedSearch],
     queryFn: async () => {
@@ -52,7 +51,7 @@ export default function App() {
 
       return res.data;
     },
-    placeholderData: (prev) => prev,
+    placeholderData: (prev: NotesResponse | undefined) => prev,
   });
 
   const notes = data?.notes ?? [];
